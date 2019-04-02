@@ -8,7 +8,7 @@ from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager
 )
 
-from django.core.mail import send_mail
+from django.core.mail import send_mail,EmailMultiAlternatives
 from django.template.loader import get_template
 from django.utils import timezone
 

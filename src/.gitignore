@@ -1,8 +1,17 @@
-.DS_STORE
+# Not Ready for Production
+# marketing/
 
 .env
-notes/email-activation.py
-src/ecommerce/aws/ignore2.py
+
+
+ecommerce/settings/local.py
+ecommerce/aws/ignore2.py
+
+.DS_STORE
+*.sublime-project
+fasttracktojquery/
+
+
 
 # Virtualenv related
 bin/
@@ -10,6 +19,7 @@ include/
 pip-selfcheck.json
 
 # Django related 
+
 # src/<yourproject>/settings/local.py
 # static-cdn/  # any collected static files 
 
@@ -113,5 +123,3 @@ ENV/
 
 # mypy
 .mypy_cache/
-
-

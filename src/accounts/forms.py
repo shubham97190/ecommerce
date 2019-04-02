@@ -195,7 +195,7 @@ class RegisterForm(forms.ModelForm):
         user.is_active = False # send confirmation email via signals
         # obj = EmailActivation.objects.create(user=user)
         # obj.send_activation_email()
-        print(commit)
+        
         if commit:
             user.save()
         return user
