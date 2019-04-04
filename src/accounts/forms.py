@@ -3,6 +3,8 @@ from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from PIL import Image
+from django.core.files import File
 
 User = get_user_model()
 
@@ -53,11 +55,28 @@ class UserAdminCreationForm(forms.ModelForm):
 
 class UserDetailChangeForm(forms.ModelForm):
     full_name = forms.CharField(label='Name', required=False, widget=forms.TextInput(attrs={"class": 'form-control'}))
-
+    x = forms.FloatField(widget=forms.HiddenInput())
+    y = forms.FloatField(widget=forms.HiddenInput())
+    width = forms.FloatField(widget=forms.HiddenInput())
+    height = forms.FloatField(widget=forms.HiddenInput())
     class Meta:
         model = User
-        fields = ['full_name']
+        fields = ['full_name','profile_image','banner_image','x', 'y', 'width', 'height',]
 
+    def save(self):
+        photo = super(UserDetailChangeForm, self).save()
+
+        x = self.cleaned_data.get('x')
+        y = self.cleaned_data.get('y')
+        w = self.cleaned_data.get('width')
+        h = self.cleaned_data.get('height')
+
+        image = Image.open(photo.file)
+        cropped_image = image.crop((x, y, w+x, h+y))
+        resized_image = cropped_image.resize((200, 200), Image.ANTIALIAS)
+        resized_image.save(photo.file.path)
+
+        return photo
 
 
 class UserAdminChangeForm(forms.ModelForm):

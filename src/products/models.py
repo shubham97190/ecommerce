@@ -9,7 +9,7 @@ from django.db.models.signals import pre_save, post_save
 from django.urls import reverse
 
 from ecommerce.aws.download.utils import AWSDownload
-from ecommerce.aws.utils import ProtectedS3Storage
+# from ecommerce.aws.utils import ProtectedS3Storage
 from ecommerce.utils import unique_slug_generator, get_filename
 
 def get_filename_ext(filepath):
@@ -93,7 +93,8 @@ class Product(models.Model):
         return self.title
 
     def get_downloads(self):
-        qs = self.productfile_set.all()
+        qqs=""
+        # qs = self.productfile_set.all()
         return qs
 
 
@@ -125,10 +126,10 @@ def upload_product_file_loc(instance, filename):
 class ProductFile(models.Model):
     product         = models.ForeignKey(Product,on_delete=models.CASCADE)
     name            = models.CharField(max_length=120, null=True, blank=True)
-    file            = models.FileField(
-                        upload_to=upload_product_file_loc, 
-                        storage=ProtectedS3Storage(), #FileSystemStorage(location=settings.PROTECTED_ROOT)
-                        ) # path
+    # file            = models.FileField(
+    #                     upload_to=upload_product_file_loc, 
+    #                     storage=ProtectedS3Storage(), #FileSystemStorage(location=settings.PROTECTED_ROOT)
+    #                     ) # path
     #filepath        = models.TextField() # '/protected/path/to/the/file/myfile.mp3'
     free            = models.BooleanField(default=False) # purchase required
     user_required   = models.BooleanField(default=False) # user doesn't matter

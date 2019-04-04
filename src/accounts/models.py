@@ -11,7 +11,7 @@ from django.contrib.auth.models import (
 from django.core.mail import send_mail,EmailMultiAlternatives
 from django.template.loader import get_template
 from django.utils import timezone
-
+from django.dispatch import receiver
 from ecommerce.utils import random_string_generator, unique_key_generator
 #send_mail(subject, message, from_email, recipient_list, html_message)
 
@@ -61,6 +61,11 @@ class User(AbstractBaseUser):
     staff       = models.BooleanField(default=False) # staff user non superuser
     admin       = models.BooleanField(default=False) # superuser 
     timestamp   = models.DateTimeField(auto_now_add=True)
+    profile_image = models.ImageField(upload_to='images/',blank=True, null=True)
+    banner_image = models.ImageField(upload_to='banner/', blank=True, null=True)
+    
+
+    
     # confirm     = models.BooleanField(default=False)
     # confirmed_date     = models.DateTimeField(default=False)
 
@@ -100,6 +105,7 @@ class User(AbstractBaseUser):
     # @property
     # def is_active(self):
     #     return self.active
+
 
 
 class EmailActivationQuerySet(models.query.QuerySet):
