@@ -55,26 +55,41 @@ class UserAdminCreationForm(forms.ModelForm):
 
 class UserDetailChangeForm(forms.ModelForm):
     full_name = forms.CharField(label='Name', required=False, widget=forms.TextInput(attrs={"class": 'form-control'}))
+
+    profile_image = forms.ImageField(required=False, widget=forms.FileInput)
+    banner_image = forms.ImageField(required=False, widget=forms.FileInput)
+
+    print("gsdhagys :--UserDetailChangeForm")
     x = forms.FloatField(widget=forms.HiddenInput())
     y = forms.FloatField(widget=forms.HiddenInput())
     width = forms.FloatField(widget=forms.HiddenInput())
     height = forms.FloatField(widget=forms.HiddenInput())
+    data = forms.CharField(widget=forms.HiddenInput())
     class Meta:
         model = User
-        fields = ['full_name','profile_image','banner_image','x', 'y', 'width', 'height',]
+        fields = ['full_name','profile_image','banner_image','x', 'y', 'width', 'height','data',]
 
     def save(self):
         photo = super(UserDetailChangeForm, self).save()
-
+        
         x = self.cleaned_data.get('x')
         y = self.cleaned_data.get('y')
         w = self.cleaned_data.get('width')
         h = self.cleaned_data.get('height')
-
-        image = Image.open(photo.file)
-        cropped_image = image.crop((x, y, w+x, h+y))
-        resized_image = cropped_image.resize((200, 200), Image.ANTIALIAS)
-        resized_image.save(photo.file.path)
+        data = self.cleaned_data.get('data')
+        print(x,y,w,h,data)
+        image=""
+        if data =="profile_image":
+            image = Image.open(photo.profile_image)
+            cropped_image = image.crop((x, y, w+x, h+y))
+            resized_image = cropped_image.resize((200, 200), Image.ANTIALIAS)
+            resized_image.save(photo.banner_image.path)
+        if data =="banner_image":
+            image = Image.open(photo.banner_image)
+            cropped_image = image.crop((x, y, w+x, h+y))
+            resized_image = cropped_image.resize((800, 280), Image.ANTIALIAS)
+            resized_image.save(photo.banner_image.path)
+        
 
         return photo
 

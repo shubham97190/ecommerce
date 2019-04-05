@@ -3,58 +3,87 @@
 
 {% block content %}
 <div class='col-12 col-md-6 mx-auto'>
-{% if title %}<h1 class='my-3'>{{ title }}</h1>{% endif %}
-<form method='POST' action='{% if action_url %}{{ action_url }}{% endif %}' enctype="multipart/form-data"> {% csrf_token %}
-    {% if next_url %}
-    <input type='hidden' name='next' value='{{ next_url }}' />
-    {% endif %}
-  {{ form.as_p }}
-  <label for='email'>Email</label>
-  <input type='text' id='email' class='form-control disabled' value='{{ request.user.email }}' disabled="disabled" /><span class='help-text'>Cannot change email</span><br/>
-  <button type='submit' class='btn btn-default my-3'>Save</button>
-  <a href='{% url "password_change" %}'>Change Password</a>
-</form>
+    {% if title %}<h1 class='my-3'>{{ title }}</h1>{% endif %}
+    <form method='POST' action='' enctype="multipart/form-data" id="formUpload">
+      {{ action_url }}
+      {% csrf_token %}
+     
+        {% if next_url %}
+        <input type='hidden' name='next' value='{{ next_url }}' />
+        {% endif %}
+      <div class="error">{{form.errors}}</div>
+      {{form.full_name.label}}<br/>
+      {{form.full_name}}<br/>
 
-<div class="modal fade" id="modalCrop">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-        <h4 class="modal-title">Crop the photo</h4>
-      </div>
-      <div class="modal-body">
-        <img src="" id="image" style="max-width: 100%;">
-      </div>
-      <div class="modal-footer">
-        <div class="btn-group pull-left" role="group">
-          <button type="button" class="btn btn-default js-zoom-in">
-            <span class="glyphicon glyphicon-zoom-in"></span>
-          </button>
-          <button type="button" class="btn btn-default js-zoom-out">
-            <span class="glyphicon glyphicon-zoom-out"></span>
-          </button>
+      {{form.profile_image.label}}
+      <img src="{{form.instance.profile_image.url}}"  class="rounded-circle" width="100" height="100"><br/>
+      {{form.profile_image}}<br/><br/>
+
+      {{form.banner_image.label}} 
+      <img src="{{form.instance.banner_image.url}}"  class="rounded-circle" width="100" height="100"><br/>
+      {{form.banner_image}}  
+      <br/><br/>
+      {{form.x}}
+      {{form.y}}
+      {{form.width}}
+      {{form.height}}
+      {{form.data}}
+      <label for='email'>Email</label>
+      <input type='text' id='email' class='form-control disabled' value='{{ request.user.email }}' disabled="disabled" /><span class='help-text'>Cannot change email</span><br/>
+      <button type='submit' class='btn btn-default my-3'>Save</button>
+      <a href='{% url "password_change" %}'>Change Password </a>
+    </form>
+    
+    <div class="modal fade" id="modalCrop">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title">Crop the photo</h4>
+          </div>
+          <div class="modal-body">
+            <img src="" id="image" style="max-width: 100%;">
+          </div>
+          <div class="modal-footer">
+            <div class="btn-group pull-left" role="group">
+              <button type="button" class="btn btn-default js-zoom-in">
+                <i class="fa fa-search-plus" aria-hidden="true"></i>
+
+              </button>
+              <button type="button" class="btn btn-default js-zoom-out">
+                <i class="fa fa-search-minus" aria-hidden="true"></i>
+
+              </button>
+            </div>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Nevermind</button>
+            <button type="button" class="btn btn-primary js-crop-and-upload">Crop and upload</button>
+          </div>
         </div>
-        <button type="button" class="btn btn-default" data-dismiss="modal">Nevermind</button>
-        <button type="button" class="btn btn-primary js-crop-and-upload">Crop and upload</button>
       </div>
     </div>
-  </div>
+
 </div>
-</div>
+{% endblock %}
+
+{% block javascript %}
 <script>
-  $(function () {
+  jQuery(document).ready(function ($) {
 
     /* SCRIPT TO OPEN THE MODAL WITH THE PREVIEW */
-    $("#id_file").change(function () {
+    var curent="";
+    
+    $("#id_profile_image, #id_banner_image").change(function () {
+      curent=this.name;
+     
+      console.log(curent);
       if (this.files && this.files[0]) {
         var reader = new FileReader();
         reader.onload = function (e) {
           $("#image").attr("src", e.target.result);
           $("#modalCrop").modal("show");
         }
-
         reader.readAsDataURL(this.files[0]);
       }
     });
@@ -64,25 +93,49 @@
     var cropBoxData;
     var canvasData;
     $("#modalCrop").on("shown.bs.modal", function () {
+      // local variable declear//
+      var maxCropBoxWidth_l=0;
+      var maxCropBoxHeight_l=0;
+      var maxWidth_l= 0;
+      var maxHeight_l=0;
+      var maxCanvasWidth_l=0;
+      var maxCanvasHeight_l=0;
+      var aspectRatio_l=1;
+
+      if(curent==='profile_image')
+      {
+        maxCropBoxWidth_l=200;
+        maxCropBoxHeight_l=200;
+        maxWidth_l=200;
+        maxHeight_l=200;
+        maxCanvasWidth_l=200;
+        maxCanvasHeight_l=200;
+        aspectRatio_l=1/1;
+      }
+      else{
+        maxCropBoxWidth_l=800;
+        maxCropBoxHeight_l=280;
+        maxWidth_l=800;
+        maxHeight=280;
+        maxCanvasWidth_l=800;
+        maxCanvasHeight_l=280;
+        aspectRatio_l=16/9;
+      }
       $image.cropper({
         viewMode: 1,
-        aspectRatio: 1 ,
-        maxCropBoxWidth: 200,
-        maxCropBoxHeight: 200,
-        maxWidth:200,
-        maxHeight:200,
         cropBoxMovable: true,
-        cropBoxResizable: true,
-        
+        cropBoxResizable: true,    
         toggleDragModeOnDblclick: false,
-        maxCanvasWidth: 200,
-        maxCanvasHeight:200,
-        ready: function () {
-    
+        aspectRatio: aspectRatio_l,
+        maxCropBoxWidth: maxCropBoxWidth_l,
+        maxCropBoxHeight: maxCropBoxHeight_l,
+        maxWidth:maxWidth_l,
+        maxHeight:maxHeight_l,
+        maxCanvasWidth: maxCanvasWidth_l,
+        maxCanvasHeight:maxCanvasHeight_l,
+        ready: function () {    
           $image.cropper("setCanvasData", canvasData);
-  
-          $image.cropper("setCropBoxData", cropBoxData);
-  
+          $image.cropper("setCropBoxData", cropBoxData);  
         }
       });
       
@@ -102,15 +155,19 @@
     });
 
     /* SCRIPT TO COLLECT THE DATA AND POST TO THE SERVER */
-    $(".js-crop-and-upload").click(function () {
+    $(".js-crop-and-upload").click(function (){
+      $("#id_data").val(curent);
+      // console.log(a);
       var cropData = $image.cropper("getData");
       $("#id_x").val(cropData["x"]);
       $("#id_y").val(cropData["y"]);
       $("#id_height").val(cropData["height"]);
       $("#id_width").val(cropData["width"]);
-      // $("#formUpload").submit();
-    });
-
-  });
+      // console.log(cropData);
+      $("#formUpload").submit();
+      $('#modalCrop').modal('toggle');
+      
+        });
+      });
 </script>
 {% endblock %}
