@@ -10,6 +10,7 @@ from django.http import HttpResponse
 from django.shortcuts import render,redirect
 from django.utils.http import is_safe_url
 from django.utils.safestring import mark_safe
+from django.http import JsonResponse
 
 from ecommerce.mixins import NextUrlMixin, RequestFormAttachMixin
 from .forms import LoginForm, RegisterForm, GuestForm, ReactivateEmailForm, UserDetailChangeForm
@@ -115,18 +116,29 @@ class RegisterView(CreateView):
 class UserDetailUpdateView(LoginRequiredMixin, UpdateView):
     form_class = UserDetailChangeForm
     template_name = 'accounts/detail-update-view.html'
-
+    
     def get_object(self):
         return self.request.user
 
     def get_context_data(self, *args, **kwargs):
         context = super(UserDetailUpdateView, self).get_context_data(*args, **kwargs)
         context['title'] = 'Change Your Account Details'
+        
         return context
 
     def get_success_url(self):
-        return reverse("account:home")
+        return reverse("account:upload_image")
 
+
+
+class UserUpdateImages(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        return JsonResponse({
+            'image': self.request.user.profile_image.url,
+            'banner': self.request.user.banner_image.url
+        })
+
+    
 
 # def login_page(request):
 #     form = LoginForm(request.POST or None)

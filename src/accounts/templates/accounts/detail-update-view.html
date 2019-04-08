@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-
-
+ 
 {% block content %}
+
 <div class='col-12 col-md-6 mx-auto'>
     {% if title %}<h1 class='my-3'>{{ title }}</h1>{% endif %}
-    <form method='POST' action='' enctype="multipart/form-data" id="formUpload">
+    <form method='POST' action='{% if action_url %}{{ action_url }}{% endif %}' enctype="multipart/form-data" id="formUpload">
       {{ action_url }}
       {% csrf_token %}
      
@@ -16,11 +16,11 @@
       {{form.full_name}}<br/>
 
       {{form.profile_image.label}}
-      <img src="{{form.instance.profile_image.url}}"  class="rounded-circle" width="100" height="100"><br/>
+      <img src="{{form.instance.profile_image.url}}"  class="rounded-circle" id="profile" width="100" height="100"><br/>
       {{form.profile_image}}<br/><br/>
 
       {{form.banner_image.label}} 
-      <img src="{{form.instance.banner_image.url}}"  class="rounded-circle" width="100" height="100"><br/>
+      <img src="{{form.instance.banner_image.url}}"  class="rounded-circle" id="banner" width="100" height="100"><br/>
       {{form.banner_image}}  
       <br/><br/>
       {{form.x}}
@@ -154,20 +154,48 @@
       $image.cropper("zoom", -0.1);
     });
 
+    $('#formUpload').on('submit',(function(e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+        $.ajax({
+            type:'POST',
+            url: "{% url 'account:user-update' %}",
+            data:formData,
+            cache:true,
+            contentType: false,
+            processData: false,
+            success:function(data){
+                console.log("success");
+                console.log(data);
+                if(curent==='profile_image'){
+                  $('#profile').attr("src",data.image);
+                }
+                if(curent==='banner_image')
+                {
+                  $('#banner').attr("src",data.banner);
+
+                }
+                // window.location.href=window.location.href;
+            },
+            error: function(data){
+                console.log("error");
+                console.log(data);
+            }
+        });
+    }));
+    
     /* SCRIPT TO COLLECT THE DATA AND POST TO THE SERVER */
     $(".js-crop-and-upload").click(function (){
       $("#id_data").val(curent);
-      // console.log(a);
+    
       var cropData = $image.cropper("getData");
       $("#id_x").val(cropData["x"]);
       $("#id_y").val(cropData["y"]);
       $("#id_height").val(cropData["height"]);
       $("#id_width").val(cropData["width"]);
-      // console.log(cropData);
-      $("#formUpload").submit();
       $('#modalCrop').modal('toggle');
-      
-        });
-      });
+      $("#formUpload").submit();
+    });
+  }); 
 </script>
 {% endblock %}

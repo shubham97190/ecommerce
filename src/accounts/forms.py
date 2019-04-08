@@ -77,20 +77,20 @@ class UserDetailChangeForm(forms.ModelForm):
         w = self.cleaned_data.get('width')
         h = self.cleaned_data.get('height')
         data = self.cleaned_data.get('data')
-        print(x,y,w,h,data)
+        print('save', photo)
         image=""
+        
         if data =="profile_image":
             image = Image.open(photo.profile_image)
             cropped_image = image.crop((x, y, w+x, h+y))
             resized_image = cropped_image.resize((200, 200), Image.ANTIALIAS)
-            resized_image.save(photo.banner_image.path)
+            resized_image.save(photo.profile_image.path)
         if data =="banner_image":
             image = Image.open(photo.banner_image)
             cropped_image = image.crop((x, y, w+x, h+y))
             resized_image = cropped_image.resize((800, 280), Image.ANTIALIAS)
             resized_image.save(photo.banner_image.path)
-        
-
+        print("after if",type(photo),photo)
         return photo
 
 

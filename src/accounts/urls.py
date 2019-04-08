@@ -4,7 +4,8 @@ from products.views import UserProductHistoryView
 from .views import (
         AccountHomeView, 
         AccountEmailActivateView,
-        UserDetailUpdateView
+        UserDetailUpdateView,
+        UserUpdateImages
         )
 
 app_name = 'ecommerce'
@@ -12,6 +13,7 @@ app_name = 'ecommerce'
 urlpatterns = [
     url(r'^$', AccountHomeView.as_view(), name='home'),
     url(r'^details/$', UserDetailUpdateView.as_view(), name='user-update'),
+    url(r'^upload-image/$',UserUpdateImages.as_view(), name='upload_image'),
     url(r'history/products/$', UserProductHistoryView.as_view(), name='user-product-history'),
     url(r'^email/confirm/(?P<key>[0-9A-Za-z]+)/$', 
             AccountEmailActivateView.as_view(), 
