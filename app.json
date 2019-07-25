@@ -1,0 +1,19 @@
+{
+  "addons": [
+
+  ],
+  "buildpacks": [
+    {
+      "url": "https://github.com/shubham97190/ecommerce"
+    }
+  ],
+  "description": "",
+  "env": {
+  },
+  "formation": {
+  },
+  "name": "ecommerce",
+  "scripts": {
+  },
+  "stack": "heroku-18"
+}
